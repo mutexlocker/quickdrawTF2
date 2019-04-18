@@ -1,8 +1,10 @@
 import tensorflow as tf
 import numpy as np
 import os
+from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras import regularizers
 import sys
-
+from time import time
 from sklearn.model_selection import train_test_split, GridSearchCV
 from matplotlib import pyplot as plt
 np.set_printoptions(threshold=2000)
@@ -12,7 +14,7 @@ dir = "data/"
 class_count = len(os.listdir(dir))
 data = []
 classcounter = 0
-totalclasses = 3
+totalclasses = 100
 samples = 10000
 label_dict = {}
 for filename in os.listdir(dir)[:totalclasses]:
@@ -74,11 +76,12 @@ print(y.shape)
 
 
 
-X_train, X_test, y_train, y_test = train_test_split(X/255.,y,test_size=0.5,random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X/255.,y,test_size=0.3,random_state=0)
 
 y_train_cnn = tf.keras.utils.to_categorical(y_train)
 y_test_cnn =  tf.keras.utils.to_categorical(y_test)
 num_classes = y_test_cnn.shape[1]
+print("number of classes :", num_classes)
 
 
 
@@ -91,17 +94,52 @@ print(y_train_cnn[9500])
 X_test_cnn = X_test.reshape(X_test.shape[0], 28, 28, 1).astype('float32')
 print("a", X_test_cnn.shape)
 # define the CNN model
+def cnn_model2():
+    # create model
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Conv2D(30, (5, 5), input_shape=(28, 28, 1),activation = 'tanh',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.Conv2D(15, (3, 3), activation = 'tanh',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.Dropout(0.4))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(256,activation = 'tanh',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Dense(128, activation = 'tanh',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='RandomUniform'))
+    # Compile model
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
+    tensorboard = TensorBoard(log_dir="logs/{}".format(time()),histogram_freq=1,
+          write_graph = True, write_images = True,write_grads = True, batch_size = 200)
+    return model,tensorboard
+
+
+
+def cnn_model1():
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Conv2D(30, (5, 5), input_shape=(28, 28, 1), activation='tanh'))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.Conv2D(15, (3, 3), activation='tanh'))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.Dropout(0.3))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(512, activation='tanh'))
+    model.add(tf.keras.layers.Dropout(0.3))
+    model.add(tf.keras.layers.Dense(256, activation='tanh'))
+    model.add(tf.keras.layers.Dense(num_classes, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
+    return model
 def cnn_model0():
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Conv2D(30, (5, 5), input_shape=(28, 28, 1), activation='relu',kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.Conv2D(30, (5, 5), input_shape=(28, 28, 1), activation='relu'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
-    model.add(tf.keras.layers.Conv2D(15, (3, 3), activation='relu',kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.Conv2D(15, (3, 3), activation='relu'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(tf.keras.layers.Dropout(0.2))
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(128, activation='relu',kernel_initializer='random_uniform'))
-    model.add(tf.keras.layers.Dense(50, activation='relu',kernel_initializer='random_uniform'))
-    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.Dense(512, activation='relu'))
+    model.add(tf.keras.layers.Dense(256, activation='relu'))
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
+    model.add(tf.keras.layers.Dense(num_classes, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
     return model
 
@@ -117,19 +155,39 @@ def cnn_model():
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(tf.keras.layers.Dropout(0.2))
     model.add(tf.keras.layers.Flatten())
-    model.add(tf.keras.layers.Dense(512,activation = 'relu',kernel_initializer='random_uniform'))
-    model.add(tf.keras.layers.Dense(256, activation = 'relu',kernel_initializer='random_uniform'))
-    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.Dense(512,activation = 'relu',kernel_initializer='RandomNormal'))
+    model.add(tf.keras.layers.Dense(256, activation = 'relu',kernel_initializer='RandomNormal'))
+    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='RandomNormal'))
     # Compile model
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
+    return model
+
+
+def cnn_model_leaky():
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Conv2D(30, (5, 5), input_shape=(28, 28, 1),kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.LeakyReLU(alpha=0.1))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.Conv2D(15, (3, 3),kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.LeakyReLU(alpha=0.1))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.Dropout(0.2))
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.Dense(512, kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.LeakyReLU(alpha=0.1))
+    model.add(tf.keras.layers.Dense(256, kernel_initializer='random_uniform'))
+    model.add(tf.keras.layers.LeakyReLU(alpha=0.1))
+    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='random_uniform'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
     return model
 
 
 np.random.seed(0)
 # build the model
-model_cnn = cnn_model0()
+model_cnn,tensorboard = cnn_model2()
+model_cnn.summary()
 # Fit the model
-model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=10, batch_size=200)
+model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=30, batch_size=400, callbacks=[tensorboard])
 # Final evaluation of the model
 scores = model_cnn.evaluate(X_test_cnn, y_test_cnn, verbose=0)
 
