@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 
-tmp = Image.open('star1.png').convert('L')
+tmp = Image.open('hat.png').convert('L')
 tmp = PIL.ImageOps.invert(tmp)
 tmp = np.asarray(tmp)
 print(tmp)
@@ -22,13 +22,14 @@ tmp = tmp.reshape(1,28, 28,1).astype('float32')
 
 
 # Model reconstruction from JSON file
-with open('model.json', 'r') as f:
+with open('model_cnn.json', 'r') as f:
     model = tf.keras.models.model_from_json(f.read())
 
 # Load weights into the new model
-model.load_weights('model.h5')
+model.load_weights('model_cnn.h5')
 print(model.summary())
 np.set_printoptions(suppress=True)
 tem_res = model.predict(tmp)
+print(tem_res)
 print(np.sort(tem_res))
 print(np.argsort(tem_res))
