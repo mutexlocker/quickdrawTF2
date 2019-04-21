@@ -80,7 +80,7 @@ print(y.shape)
 
 
 
-X_train, X_test, y_train, y_test = train_test_split(X/255.,y,test_size=0.3,random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X/255.,y,test_size=0.3,random_state=100)
 
 y_train_cnn = tf.keras.utils.to_categorical(y_train)
 y_test_cnn =  tf.keras.utils.to_categorical(y_test)
@@ -103,21 +103,22 @@ print("xtest shape is :", X_test_cnn.shape)
 def cnn_model3():
     # create model
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), input_shape=(28, 28, 1),activation = 'relu',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), input_shape=(28, 28, 1),activation = 'relu',kernel_initializer='TruncatedNormal'))
     BatchNormalization(axis=-1)
-    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation = 'relu',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation = 'relu',kernel_initializer='TruncatedNormal'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     BatchNormalization(axis=-1)
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation = 'relu',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation = 'relu',kernel_initializer='TruncatedNormal'))
     BatchNormalization(axis=-1)
-    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu', kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu', kernel_initializer='TruncatedNormal'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(tf.keras.layers.Flatten())
     BatchNormalization()
-    model.add(tf.keras.layers.Dense(512,activation = 'relu',kernel_initializer='RandomUniform'))
-    BatchNormalization()
-    model.add(tf.keras.layers.Dense(128, activation = 'tanh',kernel_initializer='RandomUniform'))
-    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='RandomUniform'))
+    model.add(tf.keras.layers.Dense(512,activation = 'relu',kernel_initializer='TruncatedNormal'))
+    model.add(tf.keras.layers.Dropout(0.3))
+    model.add(tf.keras.layers.Dense(128, activation = 'tanh',kernel_initializer='TruncatedNormal'))
+    model.add(tf.keras.layers.Dropout(0.3))
+    model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='TruncatedNormal'))
     # Compile model
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
     tensorboard = TensorBoard(log_dir="logs/{}".format(time()),histogram_freq=1,
@@ -215,9 +216,9 @@ def cnn_model_leaky():
 np.random.seed(0)
 # build the model
 model_cnn,tensorboard = cnn_model3()
-
+model_cnn.summary()
 # Fit the model
-model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=8, batch_size=100, callbacks=[tensorboard])
+model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=10, batch_size=100, callbacks=[tensorboard])
 # Final evaluation of the model
 scores = model_cnn.evaluate(X_test_cnn, y_test_cnn, verbose=0)
 

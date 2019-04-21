@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 
 
 
-tmp = Image.open('hat.png').convert('L')
-tmp = PIL.ImageOps.invert(tmp)
-tmp = np.asarray(tmp)
-print(tmp)
+# tmp = Image.open('hat.png').convert('L')
+# tmp = PIL.ImageOps.invert(tmp)
+# tmp = np.asarray(tmp)
+# print(tmp)
 
-# tmp = np.load("data/star.npy")
-# tmp = tmp[1]
+tmp = np.load("data/star.npy")
+tmp = tmp[1]
 
 print(tmp)
 print(tmp.shape)
