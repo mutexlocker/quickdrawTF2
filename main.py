@@ -11,22 +11,23 @@ from time import time
 from sklearn.model_selection import train_test_split, GridSearchCV
 from matplotlib import pyplot as plt
 
+def print_Cstyle_array(dir):
+    print("{", end=" ")
+    for filename in os.listdir(dir)[:totalclasses]:
+        print("\"" + filename.replace(".npy", "") + "\",", end=" ")
+    print("}", end=" ")
+
 
 dir = "data/"
 class_count = len(os.listdir(dir))
 data = []
 classcounter = 0
 totalclasses = 100
-print("{",end =" ")
-for filename in os.listdir(dir)[:totalclasses]:
-    print( "\"" +filename.replace(".npy","") + "\"," , end =" ")
-print("}",end =" ")
 classcounter = 0
 samples = 15000
 label_dict = {}
 for filename in os.listdir(dir)[:totalclasses]:
     tmp = np.load(dir + filename)
-    #print(tmp[1,:])
     tmp = np.c_[tmp, classcounter * np.ones(len(tmp))]
     label_dict.update({filename.replace(".npy","") : classcounter})
     print("add to dict" , filename.replace(".npy",""), classcounter)
