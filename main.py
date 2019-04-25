@@ -6,12 +6,10 @@ from tensorflow.keras import regularizers
 from tensorflow.keras.layers import TimeDistributed,Conv2D,MaxPooling2D,Dropout,LSTM,Dense
 from tensorflow.keras.layers import MaxPooling2D, ZeroPadding2D, GlobalAveragePooling2D
 from tensorflow.keras.layers import BatchNormalization
-
 import sys
 from time import time
 from sklearn.model_selection import train_test_split, GridSearchCV
 from matplotlib import pyplot as plt
-np.set_printoptions(threshold=2000)
 
 
 dir = "data/"
@@ -46,45 +44,6 @@ y.shape = shape
 print(X.shape)
 print(y.shape)
 
-# dog = np.load('data/dog.npy')
-# octopus = np.load('data/octopus.npy')
-# bee = np.load('data/bee.npy')
-# hedgehog = np.load('data/hedgehog.npy')
-# giraffe = np.load('data/giraffe.npy')
-#
-# print(dog.shape)
-# print(octopus.shape)
-# print(bee.shape)
-# print(hedgehog.shape)
-# print(giraffe.shape)
-# print("-----")
-# # add a column with labels
-# dog = np.c_[dog, np.zeros(len(dog))]
-# octopus = np.c_[octopus, np.ones(len(octopus))]
-# bee = np.c_[bee, 2*np.ones(len(bee))]
-# hedgehog = np.c_[hedgehog, 3*np.ones(len(hedgehog))]
-# giraffe = np.c_[giraffe, 4*np.ones(len(giraffe))]
-#
-# #store the label codes in a dictionary
-# label_dict = {0:'dog', 1:'octopus', 2:'bee', 3:'hedgehog', 4:'giraffe'}
-#
-# print(dog.shape)
-# print(octopus.shape)
-# print(bee.shape)
-# print(hedgehog.shape)
-# print(giraffe.shape)
-#
-
-
-
-#
-# X = np.concatenate((dog[:5000,:-1], octopus[:5000,:-1], bee[:5000,:-1], hedgehog[:5000,:-1], giraffe[:5000,:-1]), axis=0).astype('float32') # all columns but the last
-# y = np.concatenate((dog[:5000,-1], octopus[:5000,-1], bee[:5000,-1], hedgehog[:5000,-1], giraffe[:5000,-1]), axis=0).astype('float32') # the last column
-# print(X.shape,y.shape)
-#
-
-
-
 X_train, X_test, y_train, y_test = train_test_split(X/255.,y,test_size=0.4,random_state=100)
 X_test, X_realtest, y_test, y_realtest = train_test_split(X_test,y_test,test_size=0.3,random_state=100)
 
@@ -93,21 +52,7 @@ y_train_cnn = tf.keras.utils.to_categorical(y_train)
 y_test_cnn =  tf.keras.utils.to_categorical(y_test)
 y_realtest_cnn = tf.keras.utils.to_categorical(y_realtest)
 num_classes = y_test_cnn.shape[1]
-print("X_train shape is :", X_train.shape)
-print("X_test shape is :", X_test.shape)
-print("X_realtest shape is :", X_realtest.shape)
 
-print("y_train shape is :", y_train_cnn.shape)
-print("y_test shape is :", y_test_cnn.shape)
-print("y_realtest shape is :", y_realtest_cnn.shape)
-
-
-# # reshape to be [samples][pixels][width][height]
-
-# print(X_train_cnn.shape)
-# print(y_train_cnn[9500])
-# plt.imshow(X_train_cnn[9500].reshape(28,28), cmap='gray')
-# plt.savefig("test.png")
 X_train_cnn = X_train.reshape(X_train.shape[0], 28, 28,1).astype('float32')
 X_test_cnn = X_test.reshape(X_test.shape[0], 28, 28,1).astype('float32')
 X_realtest_cnn = X_realtest.reshape(X_realtest.shape[0], 28, 28,1).astype('float32')
