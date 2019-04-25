@@ -56,11 +56,8 @@ num_classes = y_test_cnn.shape[1]
 X_train_cnn = X_train.reshape(X_train.shape[0], 28, 28,1).astype('float32')
 X_test_cnn = X_test.reshape(X_test.shape[0], 28, 28,1).astype('float32')
 X_realtest_cnn = X_realtest.reshape(X_realtest.shape[0], 28, 28,1).astype('float32')
-print("x_train_cnn shape is :", X_train_cnn.shape)
-print("x_test_cnn shape is :", X_test_cnn.shape)
-print("x_realtest_cnn shape is :", X_realtest_cnn.shape)
-print(X_realtest[0])
-# define the CNN model
+
+
 def cnn_model3():
     # create model
     model = tf.keras.Sequential()
@@ -119,6 +116,7 @@ def cnn_model1():
     model.add(tf.keras.layers.Dense(num_classes, activation='sigmoid'))
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
     return model
+
 def cnn_model0():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Conv2D(30, (5, 5), input_shape=(28, 28, 1), activation='relu',kernel_initializer='RandomUniform'))
