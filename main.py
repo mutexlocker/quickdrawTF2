@@ -19,9 +19,10 @@ class_count = len(os.listdir(dir))
 data = []
 classcounter = 0
 totalclasses = 100
+print("{",end =" ")
 for filename in os.listdir(dir)[:totalclasses]:
-    print("add to dict" , filename.replace(".npy",""), classcounter)
-    classcounter += 1
+    print( "\"" +filename.replace(".npy","") + "\"," , end =" ")
+print("}",end =" ")
 classcounter = 0
 samples = 15000
 label_dict = {}
@@ -130,7 +131,7 @@ def cnn_model3():
     model.add(tf.keras.layers.Flatten())
     BatchNormalization()
     model.add(tf.keras.layers.Dense(512,activation = 'relu',kernel_initializer='RandomUniform'))
-    BatchNormalization()
+    model.add(tf.keras.layers.Dense(256,activation = 'relu',kernel_initializer='RandomUniform'))
     model.add(tf.keras.layers.Dense(128, activation = 'relu',kernel_initializer='RandomUniform'))
     model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='RandomUniform'))
     # Compile model
@@ -138,8 +139,6 @@ def cnn_model3():
     tensorboard = TensorBoard(log_dir="logs/cnn_model3_deep_{}".format(time()),histogram_freq=1,
           write_graph = True, write_images = True,write_grads = True, batch_size = 100)
     return model,tensorboard
-
-
 
 def cnn_model2():
     # create model
@@ -233,7 +232,7 @@ np.random.seed(0)
 model_cnn,tensorboard = cnn_model3()
 model_cnn.summary()
 # Fit the model
-model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=14, batch_size=200, callbacks=[tensorboard])
+model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=10, batch_size=200, callbacks=[tensorboard])
 # Final evaluation of the model
 scores = model_cnn.evaluate(X_test_cnn, y_test_cnn, verbose=0)
 print('Final Validation accuracy: ', scores[1])
@@ -242,9 +241,9 @@ print('Final test accuracy: ', scores[1])
 
 
 model_json = model_cnn.to_json()
-with open("model_cnn_deep.json", "w") as json_file:
+with open("model_cnn_deep_2.json", "w") as json_file:
     json_file.write(model_json)
 # serialize weights to HDF5
-model_cnn.save_weights("model_cnn_deep.h5")
+model_cnn.save_weights("model_cnn_deep_2.h5")
 print("Saved model to disk")
 
