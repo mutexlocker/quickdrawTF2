@@ -96,7 +96,7 @@ def cnn_model2():
     model.add(tf.keras.layers.Dense(128, activation = 'tanh',kernel_initializer='RandomUniform'))
     model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='RandomUniform'))
     # Compile model
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorycal_accuracy'])
     tensorboard = TensorBoard(log_dir="logs/{}".format(time()),histogram_freq=1,
           write_graph = True, write_images = True,write_grads = True, batch_size = 100)
     return model,tensorboard
