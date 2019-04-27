@@ -19,7 +19,7 @@ def print_Cstyle_array(dir):
 
 
 dir = "data/"
-class_count = len(os.listdir(dir))
+#class_count = len(os.listdir(dir))
 data = []
 classcounter = 0
 totalclasses = 100
@@ -35,8 +35,6 @@ for filename in os.listdir(dir)[:totalclasses]:
     classcounter += 1
 
 data = np.asarray(data)
-print("total shape" , data.shape)
-print(label_dict)
 X = data[:,:,:-1]
 shape = X.shape[0]*X.shape[1]
 X.shape = (shape, 784)
@@ -168,7 +166,9 @@ def cnn_model_leaky():
     model.add(tf.keras.layers.LeakyReLU(alpha=0.1))
     model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='random_uniform'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
-    return model
+    tensorboard = TensorBoard(log_dir="logs/leaky_{}".format(time()),histogram_freq=1,
+          write_graph = True, write_images = True,write_grads = True, batch_size = 100)
+    return model,tensorboard
 
 
 np.random.seed(0)
