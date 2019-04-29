@@ -5,7 +5,7 @@ from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import TimeDistributed,Conv2D,MaxPooling2D,Dropout,LSTM,Dense
 from tensorflow.keras.layers import MaxPooling2D, ZeroPadding2D, GlobalAveragePooling2D
-from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import BatchNormalization,Flatten
 import sys
 from time import time
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -22,7 +22,7 @@ dir = "data/"
 #class_count = len(os.listdir(dir))
 data = []
 classcounter = 0
-totalclasses = 100
+totalclasses = 4
 classcounter = 0
 samples = 15000
 label_dict = {}
@@ -55,7 +55,7 @@ num_classes = y_test_cnn.shape[1]
 X_train_cnn = X_train.reshape(X_train.shape[0], 28, 28,1).astype('float32')
 X_test_cnn = X_test.reshape(X_test.shape[0], 28, 28,1).astype('float32')
 X_realtest_cnn = X_realtest.reshape(X_realtest.shape[0], 28, 28,1).astype('float32')
-
+print("training size" , X_train_cnn.shape)
 
 def cnn_model3():
     # create model
@@ -80,6 +80,32 @@ def cnn_model3():
     tensorboard = TensorBoard(log_dir="logs/cnn_model3_deep_{}".format(time()),histogram_freq=1,
           write_graph = True, write_images = True,write_grads = True, batch_size = 100)
     return model,tensorboard
+
+def CNN_LSTM_model():
+    # create model
+    model = tf.keras.Sequential()
+    model.add(TimeDistributed(Conv2D(32, (3, 3), input_shape=(28, 28),activation = 'relu',kernel_initializer='RandomUniform')))
+    # BatchNormalization(axis=-1)
+    #     # model.add(TimeDistributed(Conv2D(32, (3, 3), activation = 'relu',kernel_initializer='RandomUniform')))
+    #     # model.add(TimeDistributed(MaxPooling2D(pool_size=(2, 2))))
+    #     # BatchNormalization(axis=-1)
+    #     # model.add(TimeDistributed(Conv2D(64, (3, 3), activation = 'relu',kernel_initializer='RandomUniform')))
+    #     # BatchNormalization(axis=-1)
+    #     # model.add(TimeDistributed(Conv2D(64, (3, 3), activation='relu', kernel_initializer='RandomUniform')))
+    #     # model.add(TimeDistributed(MaxPooling2D(pool_size=(2, 2))))
+    #     # model.add(TimeDistributed(Flatten()))
+    #model.add(LSTM(128, activation='relu', return_sequences=True))
+    # model.add(tf.keras.layers.Flatten())
+    # model.add(tf.keras.layers.Dense(512,activation = 'relu',kernel_initializer='RandomUniform'))
+    # model.add(tf.keras.layers.Dense(256,activation = 'relu',kernel_initializer='RandomUniform'))
+    # model.add(tf.keras.layers.Dense(128, activation = 'relu',kernel_initializer='RandomUniform'))
+    # model.add(tf.keras.layers.Dense(num_classes, activation='softmax',kernel_initializer='RandomUniform'))
+    # Compile model
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'top_k_categorical_accuracy'])
+    tensorboard = TensorBoard(log_dir="logs/cnn_model3_deep_{}".format(time()),histogram_freq=1,
+          write_graph = True, write_images = True,write_grads = True, batch_size = 100)
+    return model,tensorboard
+
 
 def cnn_model2():
     # create model
@@ -173,8 +199,8 @@ def cnn_model_leaky():
 
 np.random.seed(0)
 # build the model
-model_cnn,tensorboard = cnn_model3()
-model_cnn.summary()
+model_cnn,tensorboard = CNN_LSTM_model()
+#model_cnn.summary()
 # Fit the model
 model_cnn.fit(X_train_cnn, y_train_cnn, validation_data=(X_test_cnn, y_test_cnn), epochs=10, batch_size=200, callbacks=[tensorboard])
 # Final evaluation of the model
